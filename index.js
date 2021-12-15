@@ -155,9 +155,6 @@ app.put('/:id', (req, res) => {
     });
 });
 
-app.listen(port, function(){
-    console.log('Node está corriendo en el puerto: ', port);
-})
 
 
 
