@@ -52,6 +52,63 @@ app.get('/', function(req, res) {
                 }
             )
 });
+app.get('/:idViaje/:tipo', function(req, res) {
+    Viaje.find({idViaje: req.params.idViaje, tipo: req.params.tipo})
+            .exec(
+                (err, Viajes) => {
+                    if(err){
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Ocurrió un error al recuperar los viajes',
+                            errors: err
+                        });
+                    }
+                    Viaje.countDocuments({idViaje: req.params.idViaje, tipo: req.params.tipo}, (err, conteo) => {
+                        return res.status(200).json({
+                            ok: true,
+                            viajes: Viajes,
+                            total: conteo
+                        })
+                    });
+                }
+            )
+});
+app.get('/:idViaje', function(req, res) {
+    Viaje.distinct('tipo', {idViaje: req.params.idViaje})
+            .exec(
+                (err, tipos) => {
+                    if(err){
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Ocurrió un error al recuperar los viajes',
+                            errors: err
+                        });
+                    }
+                    return res.status(200).json({
+                        ok: true,
+                        tipos: tipos,
+                    })
+                }
+            )
+});
+app.get('/buscar/actualizar/:id', function(req, res) {
+    Viaje.find({_id: req.params.id})
+            .exec(
+                (err, viajes) => {
+                    if(err){
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Ocurrió un error al recuperar los viajes',
+                            errors: err
+                        });
+                    }
+                    return res.status(200).json({
+                        ok: true,
+                        viaje: viajes,
+                    })
+                }
+            )
+});
 
 app.post('/', (req, res) => {
     let body = req.body;
