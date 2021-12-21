@@ -6,6 +6,7 @@ var ViajeSchema = new Schema({
     titulo: {type: String},
     descripcion: {type: String},
     tipo: {type: String},
+    subtipo: {type: String},
     precio: {type: Number},
     url: {type: String},
     img: {type: String},

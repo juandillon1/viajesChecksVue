@@ -6,6 +6,7 @@ const port = process.env.PORT || 3000;
 bodyParser =  require('body-parser'),
 methodOverride = require('method-override'),
 mongoose = require('mongoose');
+const Themeparks = require("themeparks");
 
 // Defino estructura que usara express
 app.use(bodyParser.urlencoded({extended: false}));
@@ -91,6 +92,40 @@ app.get('/:idViaje', function(req, res) {
                 }
             )
 });
+app.get('/subtipo/:idViaje/:tipo', function(req, res) {
+    Viaje.distinct('subtipo', {idViaje: req.params.idViaje, tipo: req.params.tipo})
+            .exec(
+                (err, subtipos) => {
+                    if(err){
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Ocurrió un error al recuperar los viajes',
+                            errors: err
+                        });
+                    }
+                    return res.status(200).json({
+                        ok: true,
+                        subtipos: subtipos,
+                    })
+                }
+            )
+});
+app.get('/data/info/infodisney', function(req, res) {
+    const DisneyWorldMagicKingdom = new Themeparks.Parks.WaltDisneyWorldMagicKingdom();
+    const CheckWaitTimes = () => {
+        DisneyWorldMagicKingdom.GetWaitTimes().then((rideTimes) => {
+            rideTimes.forEach((ride) => {
+                console.log(`${ride.name}: ${ride.waitTime} minutes wait (${ride.status})`);
+            });
+        }).catch((error) => {
+            console.error(error);
+        }).then(() => {
+            setTimeout(CheckWaitTimes, 1000 * 60 * 5); // refresh every 5 minutes
+        });
+    };
+    CheckWaitTimes();
+    
+});
 app.get('/buscar/actualizar/:id', function(req, res) {
     Viaje.find({_id: req.params.id})
             .exec(
@@ -117,6 +152,7 @@ app.post('/', (req, res) => {
         titulo: body.titulo,
         descripcion: body.descripcion,
         tipo: body.tipo,
+        subtipo: body.subtipo,
         precio: body.precio,
         url: body.url,
         img: body.img,
@@ -168,6 +204,7 @@ app.put('/:id', (req, res) => {
         titulo: body.titulo,
         descripcion: body.descripcion,
         tipo: body.tipo,
+        subtipo: body.subtipo,
         precio: body.precio,
         url: body.url,
         img: body.img,
@@ -177,6 +214,7 @@ app.put('/:id', (req, res) => {
         viaje.titulo = (newViaje.titulo) ? newViaje.titulo: viaje.titulo;
         viaje.descripcion = (newViaje.descripcion) ? newViaje.descripcion: viaje.descripcion;
         viaje.tipo = (newViaje.tipo) ? newViaje.tipo: viaje.tipo;
+        viaje.subtipo = (newViaje.subtipo) ? newViaje.subtipo: viaje.subtipo;
         viaje.precio = (newViaje.precio) ? newViaje.precio: viaje.precio;
         viaje.url = (newViaje.url) ? newViaje.url: viaje.url;
         viaje.img = (newViaje.img) ? newViaje.img: viaje.img;
