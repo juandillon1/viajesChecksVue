@@ -74,6 +74,27 @@ app.get('/:idViaje/:tipo', function(req, res) {
                 }
             )
 });
+app.get('/filter/subtipo/:idViaje/:subtipo', function(req, res) {
+    Viaje.find({idViaje: req.params.idViaje, subtipo: req.params.subtipo})
+            .exec(
+                (err, Viajes) => {
+                    if(err){
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Ocurrió un error al recuperar los viajes',
+                            errors: err
+                        });
+                    }
+                    Viaje.countDocuments({idViaje: req.params.idViaje, subtipo: req.params.subtipo}, (err, conteo) => {
+                        return res.status(200).json({
+                            ok: true,
+                            viajes: Viajes,
+                            total: conteo
+                        })
+                    });
+                }
+            )
+});
 app.get('/:idViaje', function(req, res) {
     Viaje.distinct('tipo', {idViaje: req.params.idViaje})
             .exec(
@@ -92,8 +113,8 @@ app.get('/:idViaje', function(req, res) {
                 }
             )
 });
-app.get('/subtipo/:idViaje/:tipo', function(req, res) {
-    Viaje.distinct('subtipo', {idViaje: req.params.idViaje, tipo: req.params.tipo})
+app.get('/subtipo/listar/:idViaje/', function(req, res) {
+    Viaje.distinct('subtipo', {idViaje: req.params.idViaje})
             .exec(
                 (err, subtipos) => {
                     if(err){
